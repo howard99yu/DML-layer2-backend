@@ -92,11 +92,8 @@ async function giveReward(web3, metadatas, transactionHash, tokenAddress){
 }
 
 function calculateReward(metadata){
-  const average_gpu = metadata.gpu;
-  const f1_score = metadata.f1_score;
   const accuracy = metadata.accuracy;
-  const timeelapsed = metadata.time;
-  const reward = f1_score*0.4 + accuracy*0.4 + average_gpu*0.1 + (1/timeelapsed)*0.1;
+  const reward = accuracy;
   return reward;
 }
 
