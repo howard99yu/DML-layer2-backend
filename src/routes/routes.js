@@ -6,5 +6,6 @@ const userRouter = express.Router();
 
 userRouter.post("/sendBashCommand", workerNodeController.sendBashCommand);
 userRouter.post("/createNodeProvider", workerNodeController.createNodeProvider);
+userRouter.post("/createTicket", workerNodeController.createTicket);
 
 export default userRouter;
