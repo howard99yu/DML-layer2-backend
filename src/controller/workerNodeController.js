@@ -1,12 +1,21 @@
 
 import util from "../utils/utils.js";
 import workerNodeCurd from "../database/crud/workerNodeCurd.js";
+import fs from "fs";
+import path from "path";
+
+const filepath = "/mnt/c/Users/howar/Downloads/MINST/cw.txt";
 const workerNode ={
     async sendBashCommand(req,res){
         try{
             const command = req.body.param;
-            const result = await util.runBashCommand(command);
-            res.status(200).send({result: result});
+            const result =  util.runBashCommand(command);
+            while (true){
+                if (fs.existsSync(filepath)){
+                    break;
+                }
+            }
+            res.status(200).send({result: "result has been created"});
         }catch(err){
             res.status(500).send({ status: "Internal Server Error"});
         }
