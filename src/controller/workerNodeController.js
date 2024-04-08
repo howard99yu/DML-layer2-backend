@@ -16,7 +16,7 @@ const workerNode ={
             //         break;
             //     }
             // }
-            res.status(200).send({result: "result has been created"});
+            res.status(200).send({result: result});
         }catch(err){
             res.status(500).send({ status: "Internal Server Error"});
         }
