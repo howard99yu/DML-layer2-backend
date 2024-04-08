@@ -18,6 +18,13 @@ export default{
             ticket.save(); 
         }
         return ticket;
+    },
+    async getTicket(body){ 
+        const ticket = await user.findOne({ usrId: body.userId});
+        console.log(ticket);
+        if (ticket){
+            return ticket;
+        }
     }
 
 }

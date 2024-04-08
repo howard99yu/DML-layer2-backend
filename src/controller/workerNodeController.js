@@ -47,6 +47,15 @@ const workerNode ={
         catch(error){
             res.status(500).send({ status: error});
         }
+    },
+    async getTickets(req, res){
+        try{
+            const tickets = await userCrud.getTicket(req.body);
+            res.status(200).send({result: tickets});
+        }
+        catch(error){
+            res.status(500).send({ status: error});
+        }
     }
 }
 export default workerNode;

@@ -1,6 +1,7 @@
 import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
 import util from '../utils/utils.js';
+import fs from 'fs';
 
 dotenv.config();
 
