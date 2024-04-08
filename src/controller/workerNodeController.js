@@ -10,7 +10,21 @@ const workerNode ={
     async sendBashCommand(req,res){
         try{
             const command = req.body.param;
-            const result =  util.runBashCommand(command);
+            const result =  await util.runBashCommand(command);
+            // while (true){
+            //     if (fs.existsSync(filepath)){
+            //         break;
+            //     }
+            // }
+            res.status(200).send({result: "result has been created"});
+        }catch(err){
+            res.status(500).send({ status: "Internal Server Error"});
+        }
+    },
+    async runMachineLearning(req, res){
+        try{
+            const command = req.body.param;
+            const result =  await util.runBashCommand(command);
             while (true){
                 if (fs.existsSync(filepath)){
                     break;
@@ -21,6 +35,7 @@ const workerNode ={
             res.status(500).send({ status: "Internal Server Error"});
         }
     },
+
     async createNodeProvider(req, res){
         try{
             const wallet = await workerNodeCurd.createWallet(req.body);
