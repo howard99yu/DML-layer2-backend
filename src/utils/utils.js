@@ -1,5 +1,8 @@
 import {exec} from 'child_process';
-
+import TokenABI from "../../contractABI/tokenABI.js";
+import BigNumber from "bignumber.js";
+import Web3 from "web3";
+import c from 'args';
 
 async function runBashCommand(command) {
     return new Promise((resolve, reject) => {
@@ -30,7 +33,7 @@ async function transfer(web3, sender, recipient, contract, amount) {
         gasLimit: Web3.utils.toHex(gasLimit),
         gasPrice: Web3.utils.toHex(gasPrice),
         from: sender.address,
-        to: recipient,
+        to: contract,
         nonce: nonce,
         data: tokenCrt.methods.transfer(recipient, amount).encodeABI(),
       };
@@ -38,8 +41,8 @@ async function transfer(web3, sender, recipient, contract, amount) {
       // Sign and send the transaction
       const signedTx = await web3.eth.accounts.signTransaction(txObject, sender.privateKey);
       const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-  
-      console.log(`Tokens transferred successfully: ${receipt}`);
+      return receipt.logs[0].transactionHash;
+      console.log(receipt.logs[0]);
     } catch (error) {
       console.error('Error transferring tokens:', error);
     }
@@ -64,18 +67,17 @@ async function payByFile(web3, sender, recipient, contract, filesize){
 
 async function getTotalReward(web3, transactionHash){
   const transaction = await web3.eth.getTransactionReceipt(transactionHash);
-  console.log(transaction.logs[0]);
   const tokenValue = new BigNumber(transaction.logs[0].data).dividedBy('1e18').toNumber();
   console.log(`Transaction value: ${(tokenValue*0.98).toFixed(2)} tokens`);
   return (tokenValue*0.98).toFixed(2);
 }
 
-async function giveReward(web3, metadatas, transactionHash, tokenAddress){
+async function giveReward(web3,wallet,  metadatas, transactionHash, tokenAddress, walletAddresses){
   let rewards = [];
   let available_token = await getTotalReward(web3, transactionHash);
   for (let i = 0; i < metadatas.length; i++) {
       const workernode = metadatas[i];
-      const reward = calculateReward(workernode.train_result);
+      const reward = calculateReward(workernode);
       rewards.push(reward);
   }
   //calculate the total reward
@@ -86,15 +88,73 @@ async function giveReward(web3, metadatas, transactionHash, tokenAddress){
   //calculate the reward for each workernode
   for (let i = 0; i < rewards.length; i++) {
       rewards[i] = rewards[i]/total_reward * available_token;
-      await transfer(web3, wallet, metadatas[i].address, tokenAddress, rewards[i]);
+      console.log(roundDown(rewards[i],2) + " tokens");
+      try{
+        await transfer(web3, wallet, walletAddresses[i], tokenAddress, roundDown(rewards[i],2));
+      }catch(err){
+        console.log(err);
+      }
+
   }
 
 }
 
 function calculateReward(metadata){
-  const accuracy = metadata.accuracy;
+  const accuracy = metadata.sparse_categorical_accuracy[0]/metadata.sparse_categorical_accuracy[1] * 100;
   const reward = accuracy;
   return reward;
+}
+function roundDown(number, decimalPlaces) {
+  const factor = Math.pow(10, decimalPlaces);
+  return Math.floor(number * factor) / factor;
+}
+async function payNativeToken(web3, senderAddress, receiverAddress, senderPrivateKey, amount){
+  amount = roundDown(amount, 6);
+	web3.eth.accounts.wallet.add(senderPrivateKey);
+	const gasPrice = await web3.eth.getGasPrice();
+	const gasLimit = 100000;
+	const nonce = await web3.eth.getTransactionCount(senderAddress, 'latest');
+
+	return new Promise((resolve) =>{
+		const txn = web3.eth.sendTransaction({
+			gasLimit: web3.utils.toHex(gasLimit),
+			gasPrice: web3.utils.toHex(gasPrice),
+			from: senderAddress,
+			to: receiverAddress,
+			nonce: nonce,
+			value: web3.utils.toWei(amount.toString(), "ether"),
+		})
+		txn.once("receipt", (receipt) => {
+			var gasFee = receipt.gasUsed * receipt.effectiveGasPrice;
+			gasFee = web3.utils.fromWei(gasFee.toString())
+			var status;
+			if(receipt.status){
+			  status = "Success"
+			}
+			else{
+			  status = "Failed"
+			}
+			const response = {
+			  status: status,
+			  message:{
+				  transactionId: receipt.transactionHash,
+				  gasFee: Number(gasFee),
+				  senderAddress: senderAddress,
+				  receiverAddress: receiverAddress,
+				  amount: amount
+			  }
+			}
+			resolve(response);
+		});
+		txn.on("error", (error) =>{
+			const response = {
+				status: "Failed",
+				message: error.message
+			}
+			resolve(response);
+		});
+		web3.eth.accounts.wallet.remove(senderAddress);
+	});
 }
 
 const util = {
@@ -104,7 +164,8 @@ const util = {
     payByFile,
     getTotalReward,
     giveReward,
-    calculateReward
+    calculateReward,
+    payNativeToken,
 };
 
 export default util;

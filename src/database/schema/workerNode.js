@@ -5,9 +5,13 @@ const workerNodeSchema = new Schema({
         type: String,
         required: [true, "wallet address is needed"]
     },
-    username: {
+    userId: {
         type: String,
         required: [true, "worker node name is needed"]
+    },
+    status: {
+        type: String,
+        required: [true, "status is needed"]
     },
 });
 

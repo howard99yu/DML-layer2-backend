@@ -131,3 +131,6 @@ dist
 
 #test files 
 test/*.js
+*.txt
+model*
+*.pyc
