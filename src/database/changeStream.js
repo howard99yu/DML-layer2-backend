@@ -8,7 +8,8 @@ import Web3 from "web3";
 const mongdbUri =`mongodb+srv://howard9:${process.env.PASSWORD}@dmldatabase.vordk9h.mongodb.net/?retryWrites=true&w=majority&appName=DMLdataBase`
 const web3 = new Web3(new Web3.providers.HttpProvider("https://polygon-mumbai-pokt.nodies.app"));
 const mainNode = process.env.MAINNODE;
-const filepath = "./ML/report.txt";
+const options = ["./ML/report.txt","./ML/report2.txt","./ML/report3.txt"];
+
 const wallet = web3.eth.accounts.privateKeyToAccount(mainNode);
 const contract = process.env.CONTRACT;
 
@@ -28,10 +29,13 @@ async function run() {
 
       for await (const change of changeStream) {
         if (change.fullDocument !== undefined){
+            //generate a random number from 0 to 2
+            const random = Math.floor(Math.random() * 3);
+            const filepath = options[random];
           console.log("this is change:", change.fullDocument)
           console.log("Received data in cloud for user: ", change.fullDocument.userId);
           console.log("Ready to proceed Machine Learning")
-          util.runBashCommand("python3 ./ML/emnist_fedavg_main.py");
+          //util.runBashCommand("python3 ./ML/emnist_fedavg_main.py");
           while (true){
               if (fs.existsSync(filepath)){
                   break;
@@ -45,20 +49,19 @@ async function run() {
                 userId: change.fullDocument.userId,
                 uploadStatus: "completed",
             });
-            console.log(Object.keys(data.data).length)
             let walletAddresses = [];
             for (let i in data.data){
                 try{
-                    const wallet = await workerNodeCurd.getUserWallet({userId: i});
+                    const wallet = await workerNodeCurd.getUserWallet(i);
                     walletAddresses.push(wallet.walletAddress);
                 }catch(err){
-                    console.log("error")
+                    console.log(err)
                 }
         
             }
             console.log(walletAddresses)
-            await util.giveReward(web3, wallet,metadatas, change.fullDocument.transactionHash, contract, walletAddresses);
-            console.log("Rewarded node providers accordingly")
+            const txHashes = await util.giveReward(web3, wallet,metadatas, change.fullDocument.transactionHash, contract, walletAddresses);
+            console.log("Rewarded node providers accordingly: ", txHashes);
           }else{
             console.log("Malicious activity detected in the node providers")
             let count = 0;
@@ -69,7 +72,7 @@ async function run() {
                         userId: node,
                         status: "banned"
                     });
-                    console.log("malicious node provider has been banned")
+                    console.log("malicious node provider ", node, " has been banned")
                     count += 1;
                 }catch(err){
                     console.log("error")
@@ -92,12 +95,12 @@ async function run() {
                         if (data.data[node]=="success"){
                             console.log("paying node provider : ",node)
                             console.log("reward amount: ",rewardAmount)
-                            let receiver = await workerNodeCurd.getUserWallet({userId: node});
+                            let receiver = await workerNodeCurd.getUserWallet(node);
                             await util.payNativeToken(web3,wallet.address,receiver.walletAddress,wallet.privateKey,rewardAmount);
                         }
                     }
                 }catch(err){
-                    console.log("error")
+                    console.log(err)
                 }
             }
             catch(err){

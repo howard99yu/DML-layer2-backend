@@ -74,6 +74,7 @@ async function getTotalReward(web3, transactionHash){
 
 async function giveReward(web3,wallet,  metadatas, transactionHash, tokenAddress, walletAddresses){
   let rewards = [];
+  let result = [];
   let available_token = await getTotalReward(web3, transactionHash);
   for (let i = 0; i < metadatas.length; i++) {
       const workernode = metadatas[i];
@@ -90,12 +91,14 @@ async function giveReward(web3,wallet,  metadatas, transactionHash, tokenAddress
       rewards[i] = rewards[i]/total_reward * available_token;
       console.log(roundDown(rewards[i],2) + " tokens");
       try{
-        await transfer(web3, wallet, walletAddresses[i], tokenAddress, roundDown(rewards[i],2));
+        const txHash =await transfer(web3, wallet, walletAddresses[i], tokenAddress, roundDown(rewards[i],2));
+        result.push(txHash);
       }catch(err){
         console.log(err);
       }
 
   }
+  return result;
 
 }
 
