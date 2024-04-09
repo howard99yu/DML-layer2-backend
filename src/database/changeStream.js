@@ -31,7 +31,7 @@ async function run() {
           console.log("this is change:", change.fullDocument)
           console.log("Received data in cloud for user: ", change.fullDocument.userId);
           console.log("Ready to proceed Machine Learning")
-          //util.runBashCommand("python3 ./ML/emnist_fedavg_main.py");
+          util.runBashCommand("python3 ./ML/emnist_fedavg_main.py");
           while (true){
               if (fs.existsSync(filepath)){
                   break;

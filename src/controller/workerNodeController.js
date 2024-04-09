@@ -47,6 +47,15 @@ const workerNode ={
         catch(error){
             res.status(500).send({ status: error});
         }
+    },
+    async getWorkerNode(req, res){
+        try{
+            const wallet = await workerNodeCurd.getUserWallet(req.params.userId);
+            res.status(200).send({result: wallet});
+        }
+        catch(error){
+            res.status(500).send({ status: error});
+        }
     }
 }
 export default workerNode;

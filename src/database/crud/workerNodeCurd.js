@@ -18,7 +18,7 @@ export default{
     },
 
     async getUserWallet(body){
-        const wallet = await workerNode.findOne({ userId: body.userId});
+        const wallet = await workerNode.findOne({ userId: body});
         if(!wallet){
             throw new NotFoundException("wallet not found");
         }
