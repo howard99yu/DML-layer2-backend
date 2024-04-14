@@ -23,6 +23,9 @@ import functools
 import json
 import pickle
 
+
+from collections import OrderedDict
+
 from absl import app
 from absl import flags
 import numpy as np
@@ -30,6 +33,7 @@ import tensorflow as tf
 import tensorflow_federated as tff
 
 import simple_fedavg_tff
+import upload_model
 
 # from BucketDownloader import download_blobpython
 
@@ -228,10 +232,27 @@ def main(argv):
     keras_model.save_weights("./ML/model.h5")
     print("Model saved to disk")
     s = mo
-    with open("./ML/mo.txt", "w") as f:
-      f.write(str(s))
+    # Open the file in read mode
+    with open("./ML/mo.txt", "r") as file:
+        # Read the contents of the file
+        file_content = file.read()
+
+        # Convert the file content to a Python object
+        data = eval(file_content)
+
+        # Convert the Python object to JSON format
+        json_data = json.dumps(data)
+
+        # Print the JSON data
+        f.write(json_data)
+        
     with open("./ML/cw.txt", "w") as f:
-      f.write(str(cw)) 
+      f.write(str(cw))
+      
+    
+    upload_model.upload_to_bucket("model.json", "./ML/model.json", "file-bucket93")
+    upload_model.upload_to_bucket("model.h5", "./ML/model.h5", "file-bucket93")
+    
     return 0
 
   # # load json and create model
