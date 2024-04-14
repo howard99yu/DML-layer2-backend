@@ -35,8 +35,13 @@ import tensorflow_federated as tff
 import simple_fedavg_tff
 import upload_model
 
-# from BucketDownloader import download_blobpython
-
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        return super(NumpyEncoder, self).default(obj)
 
 # Training hyperparameters
 flags.DEFINE_integer('total_rounds', 1, 'Number of total training rounds.') # arg1
@@ -249,8 +254,8 @@ def main(argv):
   }
   
   case_array = [case1, case2, case3]
-  rand = np.random.choice(0,3)
-  
+  rand =2 #np.random.randint(0, 3)
+  print(case_array[rand]["status"])
   
   if (case_array[rand]["status"] == "fail"):
     with open("./ML/report.txt", "w") as f:
@@ -263,22 +268,17 @@ def main(argv):
     with open("./ML/model.json", "w") as json_file:
       json_file.write(model_json)
     keras_model.save_weights("./ML/model.h5")
-    print("Model saved to disk")
-    s = mo
     # Open the file in read mode
-    with open("./ML/mo.txt", "r") as file:
-        # Read the contents of the file
-        file_content = file.read()
-        # Convert the file content to a Python object
-        data = eval(file_content)
+    with open("./ML/mo.txt", "w") as file:
         # Convert the Python object to JSON format
-        json_data = json.dumps(data)
+        json_string = json.dumps(mo, cls=NumpyEncoder)
         # Print the JSON data
-        f.write(json_data)
+        file.write(json_string)
+    print("Model optimizer saved to disk")
     with open("./ML/cw.txt", "w") as f:
       f.write(str(cw))
-    upload_model.upload_to_bucket("model.json", "./ML/model.json", "file-bucket93")
-    upload_model.upload_to_bucket("model.h5", "./ML/model.h5", "file-bucket93")
+    # upload_model.upload_to_bucket("model.json", "./ML/model.json", "file-bucket93")
+    # upload_model.upload_to_bucket("model.h5", "./ML/model.h5", "file-bucket93")
     return 0
 
   # # load json and create model
