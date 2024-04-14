@@ -219,12 +219,45 @@ def main(argv):
   print("=====================================================")
 
 
-  # what if corrupted
-  isCorrupted = 0
-  # np.random.choice(2, 1, p=[0.95, 0.05]) # 1 is corrupted, 5% chance of corruption
-  if (isCorrupted == 1):
-    return 
+  case1 = {
+    "status" : "fail",
+    "data" : {
+      "nodeA": "fail",
+      "nodeB": "success",
+      "nodeC": "success",
+      "nodeD": "success",
+    }
+  }
+  
+  case2 = {
+    "status" : "fail",
+    "data" : {
+      "nodeA": "fail",
+      "nodeB": "fail",
+      "nodeC": "success",
+      "nodeD": "success",
+    }
+  }
+  case3 = {
+    "status" : "success",
+    "data" : {
+      "nodeA": "sucess",
+      "nodeB": "success",
+      "nodeC": "success",
+      "nodeD": "success",
+    }
+  }
+  
+  case_array = [case1, case2, case3]
+  rand = np.random.choice(0,3)
+  
+  
+  if (case_array[rand]["status"] == "fail"):
+    with open("./ML/report.txt", "w") as f:
+      f.write(str(case_array[rand]))
   else:
+    with open("./ML/report.txt", "w") as f:
+      f.write(str(case_array[rand]))
   # saves model and weights to disk
     model_json = keras_model.to_json()
     with open("./ML/model.json", "w") as json_file:
@@ -236,23 +269,16 @@ def main(argv):
     with open("./ML/mo.txt", "r") as file:
         # Read the contents of the file
         file_content = file.read()
-
         # Convert the file content to a Python object
         data = eval(file_content)
-
         # Convert the Python object to JSON format
         json_data = json.dumps(data)
-
         # Print the JSON data
         f.write(json_data)
-        
     with open("./ML/cw.txt", "w") as f:
       f.write(str(cw))
-      
-    
     upload_model.upload_to_bucket("model.json", "./ML/model.json", "file-bucket93")
     upload_model.upload_to_bucket("model.h5", "./ML/model.h5", "file-bucket93")
-    
     return 0
 
   # # load json and create model
