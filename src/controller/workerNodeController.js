@@ -41,7 +41,7 @@ const workerNode ={
     },
     async getTickets(req, res){
         try{
-            const tickets = await ticketCrud.getTicket(req.params.userId);
+            const tickets = await ticketCrud.getTicket(req.params);
             res.status(200).send({result: tickets});
         }
         catch(error){

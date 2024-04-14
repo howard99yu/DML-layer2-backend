@@ -17,4 +17,3 @@ def upload_to_bucket(blob_name, path_to_file, bucket_name):
     #returns a public url
     # return blob.public_url
     
-upload_to_bucket("model5.h5", "./ML/model.h5", "file-bucket93")

@@ -6,7 +6,7 @@ import ticketCrud from '../database/crud/ticketCrud.js';
 import Web3 from "web3";
 
 const mongdbUri =`mongodb+srv://howard9:${process.env.PASSWORD}@dmldatabase.vordk9h.mongodb.net/?retryWrites=true&w=majority&appName=DMLdataBase`
-const web3 = new Web3(new Web3.providers.HttpProvider("https://polygon-mumbai-pokt.nodies.app"));
+const web3 = new Web3(new Web3.providers.HttpProvider("https://rpc-amoy.polygon.technology/"));
 const mainNode = process.env.MAINNODE;
 const options = ["./ML/report.txt","./ML/report2.txt","./ML/report3.txt"];
 
@@ -30,23 +30,26 @@ async function run() {
       for await (const change of changeStream) {
         if (change.fullDocument !== undefined){
             //generate a random number from 0 to 2
-            const random = Math.floor(Math.random() * 3);
-            const filepath = options[random];
-          console.log("this is change:", change.fullDocument)
+            //const random = Math.floor(Math.random() * 3);
+            const filepath = './ML/report.txt'
           console.log("Received data in cloud for user: ", change.fullDocument.userId);
           console.log("Ready to proceed Machine Learning")
-          //util.runBashCommand("python3 ./ML/emnist_fedavg_main.py");
+          util.runBashCommand("python3 ./ML/emnist_fedavg_main.py");
           while (true){
               if (fs.existsSync(filepath)){
                   break;
               }
           }
-          let data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+          let data = fs.readFileSync(filepath, 'utf8');
+          data = data.replace(/'/g, '"');
+          console.log(data)
+          data = JSON.parse(data);
           console.log("Machine Learning is done return status: ", data.status);
           if (data.status === "success"){
             let metadatas = JSON.parse(fs.readFileSync("./ML/mo.txt", 'utf8'));
             await ticketCrud.updateTicket({
                 userId: change.fullDocument.userId,
+                transactionHash: change.fullDocument.transactionHash,
                 uploadStatus: "completed",
             });
             let walletAddresses = [];
@@ -83,11 +86,15 @@ async function run() {
             rewardAmount = rewardAmount/(Object.keys(data.data).length-count);
             console.log("user will get back token")
             try{
+                console.log(change.fullDocument.userId)
                 const userInfo = await ticketCrud.getTicket({userId: change.fullDocument.userId, uploadStatus: "uploaded"});
+                console.log(userInfo)
                 await util.transfer(web3, wallet, userInfo.walletAddress, contract, userInfo.amount);
+                console.log("transfer done")
                 await ticketCrud.updateTicket({
-                    userId: "userA",
+                    userId: change.fullDocument.userId,
                     uploadStatus: "rollback",
+                    transactionHash: change.fullDocument.transactionHash
                 });
                 console.log("deposited coin will be distributed to other node provider")
                 try{

@@ -246,7 +246,7 @@ def main(argv):
   case3 = {
     "status" : "success",
     "data" : {
-      "nodeA": "sucess",
+      "nodeA": "success",
       "nodeB": "success",
       "nodeC": "success",
       "nodeD": "success",
@@ -254,15 +254,13 @@ def main(argv):
   }
   
   case_array = [case1, case2, case3]
-  rand =2 #np.random.randint(0, 3)
+  rand =np.random.randint(0, 3)
   print(case_array[rand]["status"])
   
   if (case_array[rand]["status"] == "fail"):
     with open("./ML/report.txt", "w") as f:
       f.write(str(case_array[rand]))
   else:
-    with open("./ML/report.txt", "w") as f:
-      f.write(str(case_array[rand]))
   # saves model and weights to disk
     model_json = keras_model.to_json()
     with open("./ML/model.json", "w") as json_file:
@@ -277,6 +275,8 @@ def main(argv):
     print("Model optimizer saved to disk")
     with open("./ML/cw.txt", "w") as f:
       f.write(str(cw))
+    with open("./ML/report.txt", "w") as f:
+      f.write(str(case_array[rand]))
     # upload_model.upload_to_bucket("model.json", "./ML/model.json", "file-bucket93")
     # upload_model.upload_to_bucket("model.h5", "./ML/model.h5", "file-bucket93")
     return 0
