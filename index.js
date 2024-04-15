@@ -6,7 +6,7 @@ import stream from "./src/database/changeStream.js";
 
 const app = express();
 app.use(cors({
-    origin: 'http://localhost:8080', // Replace with your allowed origin
+    origin: 'http://localhost:9080', // Replace with your allowed origin
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
   }));
@@ -19,7 +19,7 @@ const port = 3000;
 
 
 db.connect();
-//stream.startChangeStream();
+stream.startChangeStream();
 
 
 app.listen(port, () => {
