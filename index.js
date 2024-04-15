@@ -19,7 +19,7 @@ const port = 3000;
 
 
 db.connect();
-stream.startChangeStream();
+//stream.startChangeStream();
 
 
 app.listen(port, () => {
