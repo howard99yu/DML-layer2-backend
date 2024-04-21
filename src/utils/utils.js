@@ -2,6 +2,7 @@ import {exec} from 'child_process';
 import TokenABI from "../../contractABI/tokenABI.js";
 import BigNumber from "bignumber.js";
 import Web3 from "web3";
+import { SMTPClient } from 'emailjs';
 import c from 'args';
 
 async function runBashCommand(command) {
@@ -159,6 +160,27 @@ async function payNativeToken(web3, senderAddress, receiverAddress, senderPrivat
 		web3.eth.accounts.wallet.remove(senderAddress);
 	});
 }
+async function sendEmail(params,title, receiver){
+  try{
+      const client = new SMTPClient({
+          user: process.env.EMAIL,
+          password: process.env.EMAIL_PASSWORD,
+          host: process.env.EMAIL_SMTP,
+          ssl: true,
+      });
+      client.send(
+          {
+              text: params,
+              from: process.env.EMAIL,
+              to: receiver,
+              subject: title,
+          }
+      )
+      return client
+  } catch (e){
+      console.log("Error sending email, retrying...................................................................................")
+  }
+}
 
 const util = {
     runBashCommand,
@@ -169,6 +191,7 @@ const util = {
     giveReward,
     calculateReward,
     payNativeToken,
+    sendEmail,
 };
 
 export default util;
