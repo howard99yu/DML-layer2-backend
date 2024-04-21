@@ -34,7 +34,7 @@ async function run() {
             const filepath = './ML/report.txt'
           console.log("Received data in cloud for user: ", change.fullDocument.userId);
           console.log("Ready to proceed Machine Learning")
-          util.runBashCommand("python3 ./ML/emnist_fedavg_main.py");
+          //util.runBashCommand("python3 ./ML/emnist_fedavg_main.py");
           while (true){
               if (fs.existsSync(filepath)){
                   break;
@@ -65,6 +65,10 @@ async function run() {
             console.log(walletAddresses)
             const txHashes = await util.giveReward(web3, wallet,metadatas, change.fullDocument.transactionHash, contract, walletAddresses);
             console.log("Rewarded node providers accordingly: ", txHashes);
+            let params = "Your ticket has been completed successfully";
+            let title = "Training Complete!";
+            let receiver = change.fullDocument.userId
+            await util.sendEmail(params,title,receiver)
           }else{
             console.log("Malicious activity detected in the node providers")
             let count = 0;
@@ -106,12 +110,16 @@ async function run() {
                             await util.payNativeToken(web3,wallet.address,receiver.walletAddress,wallet.privateKey,rewardAmount);
                         }
                     }
+                    let params = "Your ticket has been rollbacked due to malicious activity in the node provider";
+                    let title = "Ticket Rollbacked";
+                    let receiver = change.fullDocument.userId
+                    await util.sendEmail(params,title,receiver)
                 }catch(err){
                     console.log(err)
                 }
             }
             catch(err){
-                console.log("ticket does not exist")
+                console.log("error: ticket does not exist")
             }
           }
         //check for malicious node provider (check by meta data)
