@@ -17,7 +17,6 @@ export default{
         return ticket;
     },
     async getTicket(body){ 
-        console.log(body.userId , body.uploadStatus)
         const ticket = await tickets.findOne({ userId: body.userId, uploadStatus: body.uploadStatus});
         if (ticket){
             return ticket;
