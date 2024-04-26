@@ -51,7 +51,7 @@ const workerNode ={
     },
     async getUser(req, res){
         try{
-            const user = await userCrud.getUser(req.body);
+            const user = await userCrud.getUser(req.params);
             res.status(200).send({result: user});
         }
         catch(error){
