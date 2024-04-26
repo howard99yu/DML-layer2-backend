@@ -2,7 +2,7 @@ import express from "express";
 import workerNodeRouter from "./src/routes/routes.js";
 import db from "./src/database/db.js";
 import cors from "cors";
-import stream from "./src/database/changeStream.js";
+// import stream from "./src/database/changeStream.js";
 
 const app = express();
 app.use(cors({

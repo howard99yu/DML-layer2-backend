@@ -1,10 +1,7 @@
 import { Schema, model } from "mongoose";
 
 const userSchema = new Schema({
-    walletAddress: {
-        type: String,
-        required: [true, "wallet address is needed"]
-    },
+
     userId: {
         type: String,
         required: [true, "name is needed"]
@@ -16,6 +13,10 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: [true, "encrypted password is needed"]
+    },
+    userType: {
+        type: String,
+        required: [true, "usertype is needed"]
     },
 });
 

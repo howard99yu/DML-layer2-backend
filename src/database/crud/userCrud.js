@@ -1,16 +1,17 @@
 
-import user from "../schema/userSchema.js";
+import userCurd from "../schema/userSchema.js";
 import ExistedException from "../../exceptions/existedException.js";
 import NotFoundException from "../../exceptions/notFoundException.js";
 
 
 export default{
     async createUser(body){
-        const user = await user.create(body);
-        return ticket;
+        const user = await userCurd.create(body);
+        console.log("user", user);
+        return user;
     },
     async getUser(body){ 
-        const ticket = await user.findOne({ userId: body.userId, password: body.password});
+        const ticket = await userCurd.findOne({ userId: body.userId, password: body.password});
         if (ticket){
             return ticket;
         }
