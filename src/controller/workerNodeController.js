@@ -43,7 +43,7 @@ const workerNode ={
     async createUser(req, res){
         try{
             const user = await userCrud.createUser(req.body);
-            res.status(200).send({result: wallet});
+            res.status(200).send({result: user});
         }
         catch(error){
             res.status(500).send({ status: error});
