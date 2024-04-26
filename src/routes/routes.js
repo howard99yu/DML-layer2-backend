@@ -11,6 +11,6 @@ userRouter.get("/getWorkerNode/:userId", workerNodeController.getWorkerNode);
 // userRouter.post("/createPyamentTicket", workerNodeController.createPyamentTicket);
 userRouter.get("/getTicket/:userId/:uploadStatus", workerNodeController.getTickets);
 userRouter.post("/createUser", workerNodeController.createUser);
-userRouter.get("/getUser/:userId/:password", workerNodeController.getUser);
+userRouter.get("/getUser/:userId/:password/:userType", workerNodeController.getUser);
 
 export default userRouter;
