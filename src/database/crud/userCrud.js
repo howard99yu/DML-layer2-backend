@@ -6,12 +6,15 @@ import NotFoundException from "../../exceptions/notFoundException.js";
 
 export default{
     async createUser(body){
+        const exist = await userCurd.findOne({ userId: body.userId});
+        if(exist){
+            throw new ExistedException("user already exist");
+        }
         const user = await userCurd.create(body);
-        console.log("user", user);
         return user;
     },
     async getUser(body){ 
-        const ticket = await userCurd.findOne({ userId: body.userId, password: body.password});
+        const ticket = await userCurd.findOne({ userId: body.userId, password: body.password, userType: body.userType});
         if (ticket){
             return ticket;
         }
