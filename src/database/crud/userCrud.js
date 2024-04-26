@@ -10,7 +10,7 @@ export default{
         return ticket;
     },
     async getUser(body){ 
-        const ticket = await user.findOne({ userId: body.userId, walletAddress: body.walletAddress});
+        const ticket = await user.findOne({ userId: body.userId});
         if (ticket){
             return ticket;
         }
