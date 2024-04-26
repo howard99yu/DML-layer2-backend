@@ -10,7 +10,7 @@ npm install
 ```
 node index.js
 ```
-## Configure environment file according to environment, e.g. .env.development for development
+## Configure environment file according to environment, e.g. .env 
 ```
 #password for mongodb database
 PASSWORD = ""
