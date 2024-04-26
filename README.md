@@ -4,7 +4,10 @@ With the rise of the blockchain industry, concerns regarding high energy consump
 
 <div align="center">
 	<img src="./Picture1.png">
+	Simple Architecture design of back end server that is deployed on render. Illustrates two major components in Main server which is API requests handler and main machine learning server.
 </div>
+
+
 
 ## Project setup
 ```
